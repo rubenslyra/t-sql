@@ -1,0 +1,232 @@
+USE [master]
+GO
+/****** Object:  Database [empresa]    Script Date: 18/10/2023 22:29:33 ******/
+CREATE DATABASE [empresa]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'empresa', FILENAME = N'/var/opt/mssql/data/empresa.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+ LOG ON 
+( NAME = N'empresa_log', FILENAME = N'/var/opt/mssql/data/empresa_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+ WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF
+GO
+ALTER DATABASE [empresa] SET COMPATIBILITY_LEVEL = 160
+GO
+IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+begin
+EXEC [empresa].[dbo].[sp_fulltext_database] @action = 'enable'
+end
+GO
+ALTER DATABASE [empresa] SET ANSI_NULL_DEFAULT OFF 
+GO
+ALTER DATABASE [empresa] SET ANSI_NULLS OFF 
+GO
+ALTER DATABASE [empresa] SET ANSI_PADDING OFF 
+GO
+ALTER DATABASE [empresa] SET ANSI_WARNINGS OFF 
+GO
+ALTER DATABASE [empresa] SET ARITHABORT OFF 
+GO
+ALTER DATABASE [empresa] SET AUTO_CLOSE OFF 
+GO
+ALTER DATABASE [empresa] SET AUTO_SHRINK OFF 
+GO
+ALTER DATABASE [empresa] SET AUTO_UPDATE_STATISTICS ON 
+GO
+ALTER DATABASE [empresa] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+ALTER DATABASE [empresa] SET CURSOR_DEFAULT  GLOBAL 
+GO
+ALTER DATABASE [empresa] SET CONCAT_NULL_YIELDS_NULL OFF 
+GO
+ALTER DATABASE [empresa] SET NUMERIC_ROUNDABORT OFF 
+GO
+ALTER DATABASE [empresa] SET QUOTED_IDENTIFIER OFF 
+GO
+ALTER DATABASE [empresa] SET RECURSIVE_TRIGGERS OFF 
+GO
+ALTER DATABASE [empresa] SET  ENABLE_BROKER 
+GO
+ALTER DATABASE [empresa] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+ALTER DATABASE [empresa] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+ALTER DATABASE [empresa] SET TRUSTWORTHY OFF 
+GO
+ALTER DATABASE [empresa] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+GO
+ALTER DATABASE [empresa] SET PARAMETERIZATION SIMPLE 
+GO
+ALTER DATABASE [empresa] SET READ_COMMITTED_SNAPSHOT OFF 
+GO
+ALTER DATABASE [empresa] SET HONOR_BROKER_PRIORITY OFF 
+GO
+ALTER DATABASE [empresa] SET RECOVERY FULL 
+GO
+ALTER DATABASE [empresa] SET  MULTI_USER 
+GO
+ALTER DATABASE [empresa] SET PAGE_VERIFY CHECKSUM  
+GO
+ALTER DATABASE [empresa] SET DB_CHAINING OFF 
+GO
+ALTER DATABASE [empresa] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+GO
+ALTER DATABASE [empresa] SET TARGET_RECOVERY_TIME = 60 SECONDS 
+GO
+ALTER DATABASE [empresa] SET DELAYED_DURABILITY = DISABLED 
+GO
+ALTER DATABASE [empresa] SET ACCELERATED_DATABASE_RECOVERY = OFF  
+GO
+EXEC sys.sp_db_vardecimal_storage_format N'empresa', N'ON'
+GO
+ALTER DATABASE [empresa] SET QUERY_STORE = ON
+GO
+ALTER DATABASE [empresa] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 30), DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_STORAGE_SIZE_MB = 1000, QUERY_CAPTURE_MODE = AUTO, SIZE_BASED_CLEANUP_MODE = AUTO, MAX_PLANS_PER_QUERY = 200, WAIT_STATS_CAPTURE_MODE = ON)
+GO
+USE [empresa]
+GO
+/****** Object:  Table [dbo].[Funcionarios]    Script Date: 18/10/2023 22:29:33 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Funcionarios](
+	[FuncionarioID] [int] NOT NULL,
+	[Nome] [nvarchar](50) NULL,
+	[Sobrenome] [nvarchar](50) NULL,
+	[DataNascimento] [date] NULL,
+	[CargoID] [int] NULL,
+	[NivelAcessoID] [int] NULL,
+	[DepartamentoID] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[FuncionarioID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Departamentos]    Script Date: 18/10/2023 22:29:34 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Departamentos](
+	[DepartamentoID] [int] NOT NULL,
+	[NomeDepartamento] [nvarchar](50) NULL,
+	[ContagemFuncionarios] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[DepartamentoID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  View [dbo].[FuncionariosPorDepartamento]    Script Date: 18/10/2023 22:29:34 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE VIEW [dbo].[FuncionariosPorDepartamento] AS
+SELECT d.NomeDepartamento AS Departamento,
+    f.FuncionarioID,
+    f.Nome,
+    f.Sobrenome
+FROM Funcionarios f
+    INNER JOIN Departamentos d ON f.DepartamentoID = d.DepartamentoID;
+GO
+/****** Object:  Table [dbo].[Cargos]    Script Date: 18/10/2023 22:29:34 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Cargos](
+	[CargoID] [int] NOT NULL,
+	[NomeCargo] [nvarchar](50) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[CargoID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[NiveisAcesso]    Script Date: 18/10/2023 22:29:34 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[NiveisAcesso](
+	[NivelID] [int] NOT NULL,
+	[NomeNivel] [nvarchar](50) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[NivelID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  View [dbo].[ListaFuncionarios]    Script Date: 18/10/2023 22:29:34 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE VIEW [dbo].[ListaFuncionarios] AS
+SELECT f.FuncionarioID,
+    f.Nome,
+    f.Sobrenome,
+    c.NomeCargo AS Cargo,
+    na.NomeNivel AS NivelAcesso
+FROM Funcionarios f
+    INNER JOIN Cargos c ON f.CargoID = c.CargoID
+    INNER JOIN NiveisAcesso na ON f.NivelAcessoID = na.NivelID;
+GO
+/****** Object:  Table [dbo].[Salarios]    Script Date: 18/10/2023 22:29:34 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Salarios](
+	[SalarioID] [int] NOT NULL,
+	[Valor] [money] NULL,
+	[FuncionarioID] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[SalarioID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  View [dbo].[SalariosFuncionarios]    Script Date: 18/10/2023 22:29:34 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE VIEW [dbo].[SalariosFuncionarios] AS
+SELECT f.FuncionarioID,
+    f.Nome,
+    f.Sobrenome,
+    s.Valor AS Salario
+FROM Funcionarios f
+    INNER JOIN Salarios s ON f.FuncionarioID = s.FuncionarioID;
+GO
+/****** Object:  Table [dbo].[Horarios]    Script Date: 18/10/2023 22:29:34 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Horarios](
+	[HorarioID] [int] NOT NULL,
+	[HorarioEntrada] [time](7) NULL,
+	[HorarioSaida] [time](7) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[HorarioID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[Funcionarios]  WITH CHECK ADD FOREIGN KEY([CargoID])
+REFERENCES [dbo].[Cargos] ([CargoID])
+GO
+ALTER TABLE [dbo].[Funcionarios]  WITH CHECK ADD FOREIGN KEY([NivelAcessoID])
+REFERENCES [dbo].[NiveisAcesso] ([NivelID])
+GO
+ALTER TABLE [dbo].[Salarios]  WITH CHECK ADD FOREIGN KEY([FuncionarioID])
+REFERENCES [dbo].[Funcionarios] ([FuncionarioID])
+GO
+USE [master]
+GO
+ALTER DATABASE [empresa] SET  READ_WRITE 
+GO
